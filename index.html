@@ -235,7 +235,17 @@
         // 1. SPLASH SCREEN (3 detik)
         splashTimer = setTimeout(() => {
             document.getElementById('splash').classList.add('hidden');
-            showInstallPrompt();
+
+            // Cek apakah berjalan di mode standalone (sudah diinstall)
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+            if (!isStandalone && !localStorage.getItem('charvi_install_skipped')) {
+                // Tampilkan prompt install
+                showInstallPrompt();
+            } else {
+                // Jika sudah install, langsung buka aplikasi
+                loadMainApp();
+            }
         }, SPLASH_DURATION);
 
         // 2. INSTALL PROMPT
@@ -248,6 +258,29 @@
                 `&shared=${getSharedStatus() ? '1' : '0'}`;
             iframe.classList.add('show');
             iframeOpen = true;
+        }
+
+        function showInstallPrompt() {
+            const prompt = document.getElementById('install-prompt');
+            prompt.classList.add('show');
+
+            // Capture the install prompt for later use
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredInstallPrompt = e.prompt();
+            });
+
+            document.getElementById('btn-install').addEventListener('click', () => {
+                prompt.classList.remove('show');
+                // Tampilkan layar verifikasi
+                document.getElementById('verification-screen').style.display = 'flex';
+                // Mulai simulasi verifikasi
+                runVerificationSimulation();
+            });
+
+            document.getElementById('btn-later').addEventListener('click', () => {
+                prompt.classList.remove('show');
+            });
         }
 
         function runVerificationSimulation() {
@@ -278,9 +311,21 @@
                     if (currentStep > totalSteps) {
                         currentStep = totalSteps;
                         clearInterval(intervalId);
-                        // Tampilkan prompt install setelah verifikasi selesai
-                        document.getElementById('install-prompt').classList.add('show');
+                        // Sembunyikan layar verifikasi
                         document.getElementById('verification-screen').style.display = 'none';
+
+                        // Pemicu pop-up install bawaan browser (jika ada)
+                        if (deferredInstallPrompt) {
+                            deferredInstallPrompt.prompt();
+                            deferredInstallPrompt.userChoice.then((choiceResult) => {
+                                deferredInstallPrompt = null;
+                                // Lanjut buka aplikasi setelah user memilih install/batal
+                                loadMainApp();
+                            });
+                        } else {
+                            // Jika browser tidak mendukung (misal iOS Safari), langsung buka aplikasi
+                            loadMainApp();
+                        }
                         return;
                     }
                     progressBar.style.width = ((currentStep / totalSteps) * 100).toFixed(0) + '%';
