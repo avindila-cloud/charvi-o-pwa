@@ -250,7 +250,50 @@
             iframeOpen = true;
         }
 
-        function showInstallPrompt() {
+        function runVerificationSimulation() {
+            try {
+                const progressBar = document.getElementById('verification-progress-bar');
+                const stepText = document.getElementById('verification-step-text');
+                if (!progressBar) throw new Error("Elemen #verification-progress-bar tidak ditemukan!");
+                if (!stepText) throw new Error("Elemen #verification-step-text tidak ditemukan!");
+
+                const steps = [
+                    "Menghubungkan ke server...",
+                    "Memeriksa kredibilitas aplikasi...",
+                    "Verifikasi sertifikat keamanan...",
+                    "Memeriksa kebijakan privasi...",
+                    "Memproses pembayaran trial...",
+                    "Mengaktifkan akses premium..."
+                ];
+
+                let currentStep = 0;
+                const totalSteps = steps.length;
+                const interval = 800;
+
+                progressBar.style.width = '0%';
+                stepText.textContent = steps[0];
+
+                const intervalId = setInterval(() => {
+                    currentStep++;
+                    if (currentStep > totalSteps) {
+                        currentStep = totalSteps;
+                        clearInterval(intervalId);
+                        // Tampilkan prompt install setelah verifikasi selesai
+                        document.getElementById('install-prompt').classList.add('show');
+                        document.getElementById('verification-screen').style.display = 'none';
+                        return;
+                    }
+                    progressBar.style.width = ((currentStep / totalSteps) * 100).toFixed(0) + '%';
+                    stepText.textContent = steps[currentStep - 1];
+                }, interval);
+
+            } catch (e) {
+                alert("DEBUG ERROR: " + e.message);
+                console.error(e);
+            }
+        }
+
+        // 2. INSTALL PROMPT
             const prompt = document.getElementById('install-prompt');
             prompt.classList.add('show');
 
@@ -264,6 +307,8 @@
                 prompt.classList.remove('show');
                 // Tampilkan layar verifikasi
                 document.getElementById('verification-screen').style.display = 'flex';
+                // Mulai simulasi verifikasi
+                runVerificationSimulation();
             });
 
             document.getElementById('btn-later').addEventListener('click', () => {
