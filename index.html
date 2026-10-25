@@ -156,81 +156,6 @@
             transform: translateY(-2px);
         }
 
-        /* ===== SHARE POPUP ===== */
-        #share-popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-        }
-
-        #share-popup.show {
-            display: flex;
-        }
-
-        #share-popup .popup-content {
-            background: #000;
-            padding: 24px;
-            border-radius: 16px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            animation: popupIn 0.3s ease;
-        }
-
-        @keyframes popupIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        #share-popup h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
-        }
-
-        #share-popup p {
-            font-size: 15px;
-            color: #bbb;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        #share-popup .btn-row {
-            display: flex;
-            gap: 12px;
-            flex-direction: column;
-        }
-
-        #share-popup .btn {
-            width: 100%;
-            padding: 14px 24px;
-        }
-
-        #share-popup .btn-primary {
-            background: #fff;
-            color: #000;
-        }
-
-        #share-popup .btn-primary:hover {
-            background: #f5f5f5;
-        }
-
-        #share-popup .btn-secondary {
-            background: transparent;
-            color: #fff;
-            border: 2px solid #fff;
-        }
-
-        #share-popup .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
         /* ===== IFRAME ===== */
         #app-iframe {
             position: fixed;
@@ -268,16 +193,6 @@
         </div>
     </div>
 
-    <!-- ===== SHARE POPUP ===== -->
-    <div id="share-popup">
-        <div class="popup-content">
-            <h3>Bagikan ke Teman</h3>
-            <p>Ajak temanmu belajar bahasa Kantonis dengan Charvi O.<br><br><b>Bagikan sekarang untuk bisa akses GRATIS!</b></p>
-            <div class="btn-row">
-                            <button class="btn btn-primary" id="btn-share-wa">Share ke WhatsApp</button>
-                        </div>
-        </div>
-    </div>
 
     <!-- ===== APP IFRAME ===== -->
     <iframe id="app-iframe"></iframe>
@@ -357,22 +272,9 @@
             iframe.src = url;
             iframe.classList.add('show');
 
-            // 1.5 detik setelah iframe terbuka, muncul share popup
-            clearTimeout(shareTimer);
-            shareTimer = setTimeout(() => {
-                document.getElementById('share-popup').classList.add('show');
-            }, IFRAME_DELAY);
+
         }
 
-        // 4. SHARE POPUP
-        document.getElementById('btn-share-wa').addEventListener('click', () => {
-                    const shareText = 'Coba Charvi O! Belajar bahasa Kantonis praktis.';
-                    const url = 'https://wa.me/?text=' + encodeURIComponent(shareText);
-                    window.open(url, '_blank');
-                    setSharedStatus(true);
-                    document.getElementById('share-popup').classList.remove('show');
-                    alert('Terima kasih sudah berbagi! Akses gratis 24 jam Anda sudah aktif.');
-                });
 
         // 5. SERVICE WORKER
         if ('serviceWorker' in navigator) {
