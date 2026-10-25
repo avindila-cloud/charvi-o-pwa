@@ -273,7 +273,7 @@
     <div id="share-popup">
         <div class="popup-content">
             <h3>Bagikan ke Teman</h3>
-            <p>Ajak temanmu belajar bahasa Kantonis dengan Charvi O.<br><br><b>Bagikan sekarang untuk bisa akses gratis 24 jam!</b></p>
+            <p>Ajak temanmu belajar bahasa Kantonis dengan Charvi O.<br><br><b>Bagikan sekarang untuk bisa akses gratis!</b></p>
             <div class="btn-row">
                 <button class="btn btn-primary" id="btn-share-wa">Share ke WhatsApp</button>
                 <button class="btn btn-secondary" id="btn-share-later">Nanti Saja</button>
@@ -369,12 +369,13 @@
 
         // 4. SHARE POPUP
         document.getElementById('btn-share-wa').addEventListener('click', () => {
-            const shareText = 'Coba Charvi O! Belajar bahasa Kantonis praktis.';
-            const url = 'https://wa.me/?text=' + encodeURIComponent(shareText);
-            window.open(url, '_blank');
-            setSharedStatus(true);
-            document.getElementById('share-popup').classList.remove('show');
-        });
+                    const shareText = 'Coba Charvi O! Belajar bahasa Kantonis praktis.';
+                    const url = 'https://wa.me/?text=' + encodeURIComponent(shareText);
+                    window.open(url, '_blank');
+                    setSharedStatus(true);
+                    document.getElementById('share-popup').classList.remove('show');
+                    alert('Terima kasih sudah berbagi! Akses gratis 24 jam Anda sudah aktif.');
+                });
 
         document.getElementById('btn-share-later').addEventListener('click', () => {
             document.getElementById('share-popup').classList.remove('show');
