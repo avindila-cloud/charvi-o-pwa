@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charvi O — Install PWA</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#000000">
+    <meta name="background-color" content="#000000">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ===== SPLASH SCREEN ===== */
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+            z-index: 9999;
+        }
+
+        #splash.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #splash-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        #splash h1 {
+            margin-top: 16px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        #splash p {
+            margin-top: 8px;
+            font-size: 16px;
+            color: #aaa;
+        }
+
+        /* ===== INSTALL PROMPT ===== */
+        #install-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #000;
+            padding: 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            z-index: 9998;
+            display: none;
+        }
+
+        #install-prompt.show {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        #install-prompt .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        #install-prompt h2 {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        #install-prompt p {
+            font-size: 15px;
+            color: #bbb;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ===== SHARE POPUP ===== */
+        #share-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+
+        #share-popup.show {
+            display: flex;
+        }
+
+        #share-popup .popup-content {
+            background: #000;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            animation: popupIn 0.3s ease;
+        }
+
+        @keyframes popupIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #share-popup h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        #share-popup p {
+            font-size: 15px;
+            color: #bbb;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        #share-popup .btn-row {
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        #share-popup .btn {
+            width: 100%;
+            padding: 14px 24px;
+        }
+
+        #share-popup .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        #share-popup .btn-primary:hover {
+            background: #f5f5f5;
+        }
+
+        #share-popup .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        #share-popup .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* ===== IFRAME ===== */
+        #app-iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 9997;
+            display: none;
+            background: #000;
+        }
+
+        #app-iframe.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SPLASH SCREEN ===== -->
+    <div id="splash">
+        <img id="splash-logo" src="icon-512.png" alt="Charvi O Logo">
+        <h1>Charvi O</h1>
+        <p>Belajar bahasa Kantonis &mdash; di mana saja</p>
+    </div>
+
+    <!-- ===== INSTALL PROMPT ===== -->
+    <div id="install-prompt">
+        <div class="container">
+            <h2>Unduh App Charvi O</h2>
+            <p>Pasang aplikasi ini di ponsel untuk akses offline dan pemuatan cepat.</p>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="btn-install">Install Sekarang</button>
+                <button class="btn btn-secondary" id="btn-later">Nanti Saja</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SHARE POPUP ===== -->
+    <div id="share-popup">
+        <div class="popup-content">
+            <h3>Bagikan ke Teman</h3>
+            <p>Ajak temanmu belajar bahasa Kantonis dengan Charvi O!</p>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="btn-share-wa">Share ke WhatsApp</button>
+                <button class="btn btn-secondary" id="btn-share-later">Nanti Saja</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== APP IFRAME ===== -->
+    <iframe id="app-iframe"></iframe>
+
+    <script>
+        // ===== CONFIGURATION =====
+        const SPLASH_DURATION = 3000; // 3 detik
+        const IFRAME_DELAY = 1500;    // 1.5 detik setelah iframe terbuka
+        const STREAMLIT_URL = 'https://charvi-o.streamlit.app/?embed=true';
+
+        // ===== DEVICE ID =====
+        const DEVICE_ID_KEY = 'charvi_device_id';
+        const SHARED_KEY = 'charvi_shared';
+
+        function getDeviceId() {
+            let id = localStorage.getItem(DEVICE_ID_KEY);
+            if (!id || id.length < 8) {
+                id = 'pwa-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+                localStorage.setItem(DEVICE_ID_KEY, id);
+            }
+            return id;
+        }
+
+        function getSharedStatus() {
+            return localStorage.getItem(SHARED_KEY) === '1';
+        }
+
+        function setSharedStatus(status) {
+            localStorage.setItem(SHARED_KEY, status ? '1' : '0');
+        }
+
+        const deviceId = getDeviceId();
+
+        // ===== SCRIPTING =====
+        let splashTimer;
+        let installTimer;
+        let iframeOpen = false;
+        let shareTimer;
+
+        // 1. SPLASH SCREEN (3 detik)
+        splashTimer = setTimeout(() => {
+            document.getElementById('splash').classList.add('hidden');
+            showInstallPrompt();
+        }, SPLASH_DURATION);
+
+        // 2. INSTALL PROMPT
+        function showInstallPrompt() {
+            const prompt = document.getElementById('install-prompt');
+            prompt.classList.add('show');
+
+            document.getElementById('btn-install').addEventListener('click', () => {
+                prompt.classList.remove('show');
+                // Di browser modern, gunakan PWAManifest untuk install
+                if (window.navigator?.serviceWorker?.register) {
+                    // Konsumer akan install via manifest
+                    openStreamlit();
+                } else {
+                    // Fallback: langsung ke streamlit
+                    openStreamlit();
+                }
+            });
+
+            document.getElementById('btn-later').addEventListener('click', () => {
+                prompt.classList.remove('show');
+            });
+        }
+
+        // 3. OPEN STREAMLIT IFRAME
+        function openStreamlit() {
+            if (iframeOpen) return;
+            iframeOpen = true;
+
+            const url = STREAMLIT_URL +
+                `&pwa_device_id=${encodeURIComponent(deviceId)}` +
+                `&shared=${getSharedStatus() ? '1' : '0'}`;
+
+            const iframe = document.getElementById('app-iframe');
+            iframe.src = url;
+            iframe.classList.add('show');
+
+            // 1.5 detik setelah iframe terbuka, muncul share popup
+            clearTimeout(shareTimer);
+            shareTimer = setTimeout(() => {
+                document.getElementById('share-popup').classList.add('show');
+            }, IFRAME_DELAY);
+        }
+
+        // 4. SHARE POPUP
+        document.getElementById('btn-share-wa').addEventListener('click', () => {
+            const shareText = 'Coba Charvi O! Belajar bahasa Kantonis praktis.';
+            const url = 'https://wa.me/?text=' + encodeURIComponent(shareText);
+            window.open(url, '_blank');
+            setSharedStatus(true);
+            document.getElementById('share-popup').classList.remove('show');
+        });
+
+        document.getElementById('btn-share-later').addEventListener('click', () => {
+            document.getElementById('share-popup').classList.remove('show');
+        });
+
+        // 5. SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(() => console.log('Service Worker registered'))
+                    .catch((err) => console.warn('SW registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
