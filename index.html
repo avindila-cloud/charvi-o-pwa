@@ -263,9 +263,8 @@
             <h2>Unduh App Charvi O</h2>
             <p>Pasang aplikasi ini di ponsel untuk akses offline dan pemuatan cepat.</p>
             <div class="btn-row">
-                <button class="btn btn-primary" id="btn-install">Install Sekarang</button>
-                <button class="btn btn-secondary" id="btn-later">Nanti Saja</button>
-            </div>
+                            <button class="btn btn-primary" id="btn-install">Install Sekarang</button>
+                        </div>
         </div>
     </div>
 
@@ -273,11 +272,10 @@
     <div id="share-popup">
         <div class="popup-content">
             <h3>Bagikan ke Teman</h3>
-            <p>Ajak temanmu belajar bahasa Kantonis dengan Charvi O.<br><br><b>Bagikan sekarang untuk bisa akses gratis!</b></p>
+            <p>Ajak temanmu belajar bahasa Kantonis dengan Charvi O.<br><br><b>Bagikan sekarang untuk bisa akses GRATIS!</b></p>
             <div class="btn-row">
-                <button class="btn btn-primary" id="btn-share-wa">Share ke WhatsApp</button>
-                <button class="btn btn-secondary" id="btn-share-later">Nanti Saja</button>
-            </div>
+                            <button class="btn btn-primary" id="btn-share-wa">Share ke WhatsApp</button>
+                        </div>
         </div>
     </div>
 
@@ -331,9 +329,8 @@
             prompt.classList.add('show');
 
             document.getElementById('btn-install').addEventListener('click', () => {
-                prompt.classList.remove('show');
-                // Di browser modern, gunakan PWAManifest untuk install
-                if (window.navigator?.serviceWorker?.register) {
+                            prompt.classList.remove('show');
+                            if (window.navigator?.serviceWorker?.register) {
                     // Konsumer akan install via manifest
                     openStreamlit();
                 } else {
@@ -376,10 +373,6 @@
                     document.getElementById('share-popup').classList.remove('show');
                     alert('Terima kasih sudah berbagi! Akses gratis 24 jam Anda sudah aktif.');
                 });
-
-        document.getElementById('btn-share-later').addEventListener('click', () => {
-            document.getElementById('share-popup').classList.remove('show');
-        });
 
         // 5. SERVICE WORKER
         if ('serviceWorker' in navigator) {
