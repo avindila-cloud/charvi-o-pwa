@@ -262,35 +262,12 @@
 
             document.getElementById('btn-install').addEventListener('click', () => {
                 prompt.classList.remove('show');
-                // Tampilkan Peringatan Keamanan
-                document.getElementById('security-dialog').style.display = 'flex';
-            });
-
-            document.getElementById('btn-cancel-install').addEventListener('click', () => {
-                document.getElementById('security-dialog').style.display = 'none';
-                // Kembalikan ke prompt install awal
-                prompt.classList.add('show');
-            });
-
-            document.getElementById('btn-confirm-install').addEventListener('click', async () => {
-                document.getElementById('security-dialog').style.display = 'none';
-
-                if (deferredInstallPrompt) {
-                    deferredInstallPrompt.prompt();
-                    const { outcome } = await deferredInstallPrompt.userChoice;
-                    console.log(`Install choice: ${outcome}`);
-                    deferredInstallPrompt = null;
-                } else {
-                    alert('Browser Anda tidak mendukung instalasi otomatis. Silakan gunakan menu browser untuk "Add to Home Screen".');
-                }
-
-                // Lanjutkan ke aplikasi
-                loadMainApp();
+                // Tampilkan layar verifikasi
+                document.getElementById('verification-screen').style.display = 'flex';
             });
 
             document.getElementById('btn-later').addEventListener('click', () => {
                 prompt.classList.remove('show');
-                document.getElementById('security-dialog').style.display = 'none';
             });
         }
 
@@ -321,19 +298,19 @@
         }
     </script>
 
-    <!-- MODAL PERINGATAN KEAMANAN -->
-    <div id="security-dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-        <div style="background: #1e1e1e; padding: 24px; border-radius: 16px; max-width: 320px; width: 90%; text-align: center; font-family: -apple-system, sans-serif; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div style="font-size: 48px; margin-bottom: 12px;">🛡️</div>
-            <h2 style="margin: 0 0 12px 0; font-size: 20px; color: #fff;">Peringatan Keamanan</h2>
-            <p style="margin: 0 0 24px 0; font-size: 14px; color: #aaa; line-height: 1.5;">
-                Anda akan memasang aplikasi <strong>Charvi O</strong>. Pastikan Anda mempercayai sumber ini.
-            </p>
-            <div style="display: flex; gap: 12px;">
-                <button id="btn-cancel-install" style="flex: 1; padding: 14px; border: none; border-radius: 10px; background: #333; color: #fff; font-weight: bold; cursor: pointer;">Batal</button>
-                <button id="btn-confirm-install" style="flex: 1; padding: 14px; border: none; border-radius: 10px; background: #E63946; color: white; font-weight: bold; cursor: pointer;">Lanjutkan</button>
-            </div>
+    <!-- LAYAR SIMULASI VERIFIKASI KEAMANAN -->
+    <div id="verification-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: -apple-system, sans-serif; padding: 20px; box-sizing: border-box; text-align: center;">
+        <div style="margin-bottom: 30px;">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
         </div>
+        <h2 style="margin: 0 0 10px 0; font-size: 22px;">Memverifikasi Aplikasi</h2>
+        <p style="margin: 0 0 30px 0; font-size: 14px; color: #aaa;">Harap tunggu, ini hanya butuh beberapa detik.</p>
+
+        <div style="width: 100%; max-width: 300px; background-color: #333; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
+            <div id="verification-progress-bar" style="width: 0%; height: 8px; background-color: #4CAF50; border-radius: 8px; transition: width 0.3s ease;"></div>
+        </div>
+
+        <p id="verification-step-text" style="margin: 0; font-size: 13px; color: #888; min-height: 18px;">Menghubungkan ke server...</p>
     </div>
 </body>
 </html>
