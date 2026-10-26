@@ -1,0 +1,300 @@
+#!/usr/bin/env python3
+"""Write new index.html using full Windows path."""
+import pathlib
+
+# Use full Windows path (no /c/ prefix)
+OUTPUT = pathlib.Path("C:/Users/My OvoneL is Awesome/charvi-o-pwa/index.html")
+
+HTML = r"""<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charvi O - Install PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <meta name="theme-color" content="#000000">
+    <meta name="background-color" content="#000000">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000; color: #fff; overflow: hidden; height: 100vh; }
+
+        /* ===== SPLASH SCREEN ===== */
+        #splash {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s;
+        }
+        #splash.hidden { opacity: 0; pointer-events: none; }
+        #splash-logo { width: 120px; height: 120px; border-radius: 24px; margin-bottom: 20px; }
+        #splash h1 { color: #fff; font-family: sans-serif; font-size: 28px; margin: 0; }
+        #splash p { color: #888; font-family: sans-serif; font-size: 14px; margin-top: 8px; }
+        .splash-spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #4CAF50; border-radius: 50%; animation: spin 0.8s linear infinite; margin-top: 40px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== INSTALL SCREEN ===== */
+        #install-screen {
+            display: none; position: fixed; inset: 0; background: #000; z-index: 9998;
+            flex-direction: column; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box;
+        }
+        #install-screen.show { display: flex; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #install-screen img { width: 120px; height: 120px; border-radius: 24px; margin-bottom: 24px; }
+        #install-screen h1 { color: #fff; font-family: sans-serif; font-size: 28px; margin: 0 0 8px 0; }
+        #install-screen p { color: #888; font-family: sans-serif; font-size: 14px; margin: 0 0 48px 0; }
+        #btn-install { padding: 18px 48px; font-size: 18px; font-weight: bold; background: #4CAF50; color: white; border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 4px 16px rgba(76,175,80,0.4); }
+        #btn-install:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76,175,80,0.5); }
+        .install-subtitle { color: #555; font-family: sans-serif; font-size: 12px; margin-top: 24px; }
+
+        /* ===== SECURITY SCAN SCREEN ===== */
+        #xiaomi-scan-screen {
+            display: none; position: fixed; inset: 0; background: #111; z-index: 10000;
+            flex-direction: column; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; box-sizing: border-box;
+        }
+        #xiaomi-scan-screen.show { display: flex; }
+        #scan-title { margin: 0; font-size: 24px; font-weight: bold; color: #fff; }
+        #scan-subtitle { margin: 4px 0 0 0; font-size: 14px; color: #888; }
+        .scan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px; }
+        .brand-icon { font-size: 40px; color: #4CAF50; }
+        .app-info { background: #222; border-radius: 16px; padding: 16px; display: flex; align-items: center; margin-top: 24px; gap: 16px; }
+        .app-info img { width: 56px; height: 56px; border-radius: 12px; }
+        .app-info h3 { margin: 0; font-size: 16px; color: #fff; }
+        .app-info .app-meta { margin: 2px 0; font-size: 12px; color: #888; }
+        .scan-list { margin-top: 32px; display: flex; flex-direction: column; gap: 20px; }
+        .scan-row { display: flex; justify-content: space-between; align-items: center; }
+        .scan-row .label { font-size: 15px; color: #fff; }
+        .scan-row .status { font-size: 12px; color: #888; }
+        .scan-icon { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #4CAF50; border-radius: 50%; animation: spin 1s linear infinite; }
+        .checkmark { color: #4CAF50; font-size: 20px; font-weight: bold; }
+        .scan-actions { display: none; margin-top: auto; padding-bottom: 24px; }
+        .scan-actions button { width: 100%; padding: 16px; border-radius: 24px; border: none; background: #4CAF50; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
+        #app-iframe { display: none; position: fixed; inset: 0; width: 100%; height: 100%; border: none; z-index: 9997; background: #000; }
+        #app-iframe.show { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. SPLASH SCREEN -->
+    <div id="splash">
+        <img id="splash-logo" src="icon-192.png" alt="Charvi O">
+        <h1>Charvi O</h1>
+        <p>Penerjemah Indonesia Kantonis</p>
+        <div class="splash-spinner"></div>
+    </div>
+
+    <!-- 2. INSTALL SCREEN -->
+    <div id="install-screen">
+        <img src="icon-192.png" alt="Charvi O">
+        <h1>Charvi O</h1>
+        <p>Penerjemah Indonesia Kantonis</p>
+        <button id="btn-install">Install Aplikasi</button>
+        <p class="install-subtitle">Gratis Aman Tanpa Iklan</p>
+    </div>
+
+    <!-- 3. SIMULASI PEMINDAIAN KEAMANAN -->
+    <div id="xiaomi-scan-screen">
+        <div class="scan-header">
+            <div>
+                <h1 id="scan-title">Memindai keamanan...</h1>
+                <p id="scan-subtitle">Pemindaian keamanan perangkat</p>
+            </div>
+            <div class="brand-icon">Sama</div>
+        </div>
+        <div class="app-info">
+            <img src="icon-192.png" alt="App Icon">
+            <div>
+                <h3>Charvi O</h3>
+                <p class="app-meta">Versi: 1.0.0</p>
+                <p class="app-meta">Ukuran: 14.5 MB</p>
+            </div>
+        </div>
+        <div class="scan-list">
+            <div class="scan-row">
+                <div>
+                    <div class="label">Pindai virus</div>
+                    <div id="status-virus" class="status">Memindai...</div>
+                </div>
+                <div id="icon-virus" class="scan-icon"></div>
+            </div>
+            <div class="scan-row">
+                <div>
+                    <div class="label">Pemeriksaan apl bajakan</div>
+                    <div id="status-piracy" class="status">Memindai...</div>
+                </div>
+                <div id="icon-piracy" class="scan-icon"></div>
+            </div>
+            <div class="scan-row">
+                <div>
+                    <div class="label">Risiko lainnya</div>
+                    <div id="status-risk" class="status">Memindai...</div>
+                </div>
+                <div id="icon-risk" class="scan-icon"></div>
+            </div>
+        </div>
+        <div class="scan-actions" id="xiaomi-actions">
+            <button id="btn-xiaomi-open">Buka Aplikasi</button>
+        </div>
+    </div>
+
+    <!-- 4. IFRAME -->
+    <iframe id="app-iframe"></iframe>
+
+    <script>
+        // ===== CONFIGURATION =====
+        const SPLASH_DURATION = 5000;
+        const STREAMLIT_URL = 'https://charvi-o.streamlit.app/?embed=true';
+
+        // ===== STATE =====
+        let splashTimer;
+        let deferredInstallPrompt = null;
+
+        // ===== DEVICE ID =====
+        function getDeviceId() {
+            let id = localStorage.getItem('charvi_device_id');
+            if (!id || id.length < 8) {
+                id = 'pwa-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+                localStorage.setItem('charvi_device_id', id);
+            }
+            return id;
+        }
+        const deviceId = getDeviceId();
+
+        // ===== 1. SPLASH SCREEN (5 detik) =====
+        splashTimer = setTimeout(() => {
+            const splash = document.getElementById('splash');
+            splash.classList.add('hidden');
+
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                                 window.navigator.standalone === true;
+
+            if (isStandalone) {
+                loadMainApp();
+            } else {
+                document.getElementById('install-screen').classList.add('show');
+            }
+        }, SPLASH_DURATION);
+
+        // ===== LOAD MAIN APP =====
+        function loadMainApp() {
+            const iframe = document.getElementById('app-iframe');
+            iframe.src = STREAMLIT_URL + '&pwa_device_id=' + encodeURIComponent(deviceId) + '&shared=' + (getSharedStatus() ? '1' : '0');
+            iframe.classList.add('show');
+        }
+
+        function getSharedStatus() {
+            return localStorage.getItem('charvi_shared') === '1';
+        }
+
+        // ===== 2. TOMBOL INSTALL =====
+        const btnInstall = document.getElementById('btn-install');
+        if (btnInstall) {
+            btnInstall.addEventListener('click', () => {
+                console.log('Install button clicked');
+                document.getElementById('install-screen').classList.remove('show');
+                const scanScreen = document.getElementById('xiaomi-scan-screen');
+                if (scanScreen) { scanScreen.classList.add('show'); }
+                runVerificationSimulation();
+            });
+        }
+
+        // ===== 3 & 4. SIMULASI PEMINDAIAN KEAMANAN =====
+        function runVerificationSimulation() {
+            document.getElementById('scan-title').innerText = 'Memindai keamanan...';
+            document.getElementById('scan-title').style.color = '#fff';
+            document.getElementById('scan-subtitle').innerText = 'Pemindaian keamanan perangkat';
+
+            document.getElementById('status-virus').innerText = 'Memindai...';
+            document.getElementById('icon-virus').className = 'scan-icon';
+            document.getElementById('icon-virus').innerText = '';
+
+            document.getElementById('status-piracy').innerText = 'Memindai...';
+            document.getElementById('icon-piracy').className = 'scan-icon';
+            document.getElementById('icon-piracy').innerText = '';
+
+            document.getElementById('status-risk').innerText = 'Memindai...';
+            document.getElementById('icon-risk').className = 'scan-icon';
+            document.getElementById('icon-risk').innerText = '';
+
+            document.getElementById('xiaomi-actions').style.display = 'none';
+
+            setTimeout(() => {
+                document.getElementById('icon-virus').className = 'checkmark';
+                document.getElementById('icon-virus').innerText = 'V';
+                document.getElementById('status-virus').innerText = 'Tidak ada virus';
+            }, 1500);
+
+            setTimeout(() => {
+                document.getElementById('icon-piracy').className = 'checkmark';
+                document.getElementById('icon-piracy').innerText = 'V';
+                document.getElementById('status-piracy').innerText = 'Aman';
+            }, 2500);
+
+            setTimeout(() => {
+                document.getElementById('icon-risk').className = 'checkmark';
+                document.getElementById('icon-risk').innerText = 'V';
+                document.getElementById('status-risk').innerText = 'Tidak ada risiko terdeteksi';
+
+                document.getElementById('scan-title').innerText = 'Lolos tes keamanan';
+                document.getElementById('scan-title').style.color = '#4CAF50';
+                document.getElementById('scan-subtitle').innerText = 'Tidak ada risiko terdeteksi';
+                document.getElementById('xiaomi-actions').style.display = 'flex';
+            }, 3500);
+        }
+
+        // ===== 6. TOMBOL BAJU BUKA =====
+        const btnXiaomiOpen = document.getElementById('btn-xiaomi-open');
+        if (btnXiaomiOpen) {
+            btnXiaomiOpen.addEventListener('click', () => {
+                console.log('Tombol Buka diklik');
+                const scanScreen = document.getElementById('xiaomi-scan-screen');
+                if (scanScreen) { scanScreen.classList.remove('show'); }
+                loadMainApp();
+            });
+        }
+
+        // ===== SERVICE WORKER =====
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(() => console.log('Service Worker registered'))
+                    .catch((err) => console.warn('SW registration failed:', err));
+            });
+        }
+
+        // ===== INSTALL PROMPT (native Chrome dialog) =====
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+        });
+    </script>
+</body>
+</html>
+"""
+
+
+def main():
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    # Check if file exists and get current content
+    current = ""
+    if OUTPUT.exists():
+        current = OUTPUT.read_text(encoding="utf-8")
+        print(f"Found existing file: {len(current)} chars")
+
+    # Write
+    if OUTPUT.exists():
+        print(f"Overwriting: {OUTPUT}")
+    else:
+        print(f"Creating new file: {OUTPUT}")
+
+    OUTPUT.write_text(HTML, encoding="utf-8")
+    print(f"Done. {len(HTML)} chars written.")
+
+    # Verify
+    written = OUTPUT.read_text(encoding="utf-8")
+    assert written == HTML, f"Verification failed! Expected {len(HTML)} chars, got {len(written)}"
+    print("Verification: content matches exactly.")
+
+
+if __name__ == "__main__":
+    main()
