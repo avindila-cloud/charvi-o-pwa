@@ -145,6 +145,11 @@
     </div>
 
     <script>
+        window.onerror = function(msg, url, line) {
+            alert("⚠️ JAVASCRIPT ERROR:\n" + msg + "\nDi baris: " + line);
+            return false;
+        };
+
         // ===== CONFIGURATION =====
         const SPLASH_DURATION = 5000;
         const STREAMLIT_URL = 'https://charvi-o.streamlit.app/?embed=true';
@@ -215,7 +220,7 @@
             });
         }
 
-        // ===== 3 & 4. SIMULASI PEMINDAIAN KEAMANAN =====
+        // ===== 5. SIMULASI PEMINDAIAN KEAMANAN =====
         function runVerificationSimulation() {
             document.getElementById('scan-title').innerText = 'Memindai keamanan...';
             document.getElementById('scan-title').style.color = '#fff';
@@ -259,6 +264,8 @@
             }, 3500);
         }
 
+
+
         // ===== 6. TOMBOL BAJU BUKA =====
         const btnXiaomiOpen = document.getElementById('btn-xiaomi-open');
         if (btnXiaomiOpen) {
@@ -267,21 +274,6 @@
                 const scanScreen = document.getElementById('xiaomi-scan-screen');
                 if (scanScreen) { scanScreen.classList.remove('show'); }
                 loadMainApp();
-            });
-        }
-
-        // ===== 5. TOMBOL INSTALL (trigger native prompt) =====
-        const btnInstall = document.getElementById('btn-install');
-        if (btnInstall) {
-            btnInstall.addEventListener('click', () => {
-                console.log('Install button clicked');
-                if (deferredInstallPrompt) {
-                    deferredInstallPrompt.prompt();
-                } else {
-                    // Manual install fallback (no native prompt available)
-                    const modal = document.getElementById('manual-install-modal');
-                    if (modal) { modal.style.display = 'flex'; }
-                }
             });
         }
 
