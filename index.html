@@ -235,18 +235,21 @@
         // 1. SPLASH SCREEN (3 detik)
         splashTimer = setTimeout(() => {
             document.getElementById('splash').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
+            }, 500);
 
-            // Cek apakah berjalan di mode standalone (sudah diinstall)
+            // SELALU tampilkan install prompt (kecuali sudah standalone)
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-            if (!isStandalone && !localStorage.getItem('charvi_install_skipped')) {
-                // Tampilkan prompt install
-                showInstallPrompt();
-            } else {
-                // Jika sudah install, langsung buka aplikasi
+            if (isStandalone) {
+                // Sudah terinstall → langsung buka app
                 loadMainApp();
+            } else {
+                // Belum install → SELALU tampilkan prompt install custom kita
+                document.getElementById('install-prompt').classList.add('show');
             }
-        }, SPLASH_DURATION);
+        }, 5000);
 
         // 2. INSTALL PROMPT
         let deferredInstallPrompt = null;
