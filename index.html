@@ -166,16 +166,29 @@
 
         // ===== 1. SPLASH SCREEN (5 detik) =====
         splashTimer = setTimeout(() => {
+            console.log('Splash timer selesai, mencoba pindah layar...');
             const splash = document.getElementById('splash');
-            splash.classList.add('hidden');
+            if (!splash) {
+                console.error('ERROR: Elemen #splash tidak ditemukan!');
+                return;
+            }
+            splash.style.opacity = '0';
+            setTimeout(() => { splash.style.display = 'none'; }, 500);
 
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                                 window.navigator.standalone === true;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            console.log('Mode Standalone?', isStandalone);
 
             if (isStandalone) {
+                console.log('Sudah install, membuka app...');
                 loadMainApp();
             } else {
-                document.getElementById('install-screen').classList.add('show');
+                console.log('Belum install, menampilkan layar Install...');
+                const installScreen = document.getElementById('install-screen');
+                if (!installScreen) {
+                    console.error('ERROR: Elemen #install-screen tidak ditemukan!');
+                } else {
+                    installScreen.style.display = 'flex';
+                }
             }
         }, SPLASH_DURATION);
 
