@@ -270,19 +270,7 @@
             // Capture the install prompt for later use
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
-                deferredInstallPrompt = e.prompt();
-            });
-
-            document.getElementById('btn-install').addEventListener('click', () => {
-                prompt.classList.remove('show');
-                // Tampilkan layar verifikasi
-                document.getElementById('verification-screen').style.display = 'flex';
-                // Mulai simulasi verifikasi
-                runVerificationSimulation();
-            });
-
-            document.getElementById('btn-later').addEventListener('click', () => {
-                prompt.classList.remove('show');
+                deferredInstallPrompt = e;
             });
         }
 
@@ -366,6 +354,36 @@
                     .catch((err) => console.warn('SW registration failed:', err));
             });
         }
+
+        // Event listener for Install and Later buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            // Event listener untuk tombol Install
+            const btnInstall = document.getElementById('btn-install');
+            if (btnInstall) {
+                btnInstall.addEventListener('click', () => {
+                    console.log('btn-install clicked');
+                    // Sembunyikan prompt install
+                    document.getElementById('install-prompt').classList.remove('show');
+                    // Tampilkan layar verifikasi
+                    document.getElementById('verification-screen').style.display = 'flex';
+                    // Jalankan simulasi verifikasi
+                    if (typeof runVerificationSimulation === 'function') {
+                        runVerificationSimulation();
+                    } else {
+                        alert('ERROR: runVerificationSimulation tidak ditemukan!');
+                    }
+                });
+            }
+
+            // Event listener untuk tombol Nanti Saja
+            const btnLater = document.getElementById('btn-later');
+            if (btnLater) {
+                btnLater.addEventListener('click', () => {
+                    document.getElementById('install-prompt').classList.remove('show');
+                    loadMainApp();
+                });
+            }
+        });
     </script>
 
     <!-- LAYAR SIMULASI VERIFIKASI KEAMANAN -->
