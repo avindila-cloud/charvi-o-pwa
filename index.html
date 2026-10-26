@@ -328,11 +328,6 @@
                     "Mengaktifkan akses premium..."
                 ];
 
-                let currentStep = 0;
-                const totalSteps = steps.length;
-                const interval = 800;
-
-                // Update status indicators based on current step
                 const updateStatus = (step) => {
                     if (step >= 1 && statusElements.virus) {
                         statusElements.virus.textContent = 'Memindai...';
@@ -345,33 +340,40 @@
                     }
                 };
 
-                const intervalId = setInterval(() => {
-                    currentStep++;
-                    if (currentStep > totalSteps) {
-                        currentStep = totalSteps;
-                        clearInterval(intervalId);
-                        // Hide scan screen
-                        if (scanScreen) {
-                            scanScreen.style.display = 'none';
-                        }
-
-                        // Pemicu pop-up install bawaan browser (jika ada)
-                        if (deferredInstallPrompt) {
-                            deferredInstallPrompt.prompt();
-                            deferredInstallPrompt.userChoice.then((choiceResult) => {
-                                deferredInstallPrompt = null;
-                                // Lanjut buka aplikasi setelah user memilih install/batal
-                                loadMainApp();
-                            });
-                        } else {
-                            // Jika browser tidak mendukung (misal iOS Safari), langsung buka aplikasi
-                            loadMainApp();
-                        }
-                        return;
+                // Jalankan simulasi verifikasi: 6 langkah (800ms each = 4800ms total)
+                (function runStep(step) {
+                    if (step > steps.length) {
+                        step = steps.length;
                     }
-                    updateStatus(currentStep);
-                }, interval);
-
+                    if (step >= 1 && statusElements.virus) {
+                        statusElements.virus.textContent = steps[step - 1];
+                    }
+                    if (step >= 2 && statusElements.piracy) {
+                        statusElements.piracy.textContent = steps[step - 1];
+                    }
+                    if (step >= 3 && statusElements.risk) {
+                        statusElements.risk.textContent = steps[step - 1];
+                    }
+                    if (step < steps.length) {
+                        setTimeout(() => runStep(step + 1), 800);
+                    } else {
+                        // SELESAI: Tampilkan tombol, JANGAN auto-open
+                        const action = document.getElementById('xiaomi-actions');
+                        if (action) {
+                            action.style.display = 'flex';
+                        }
+                        const t = document.getElementById('scan-title');
+                        const st = document.getElementById('scan-subtitle');
+                        if (t) {
+                            t.innerText = 'Lolos tes keamanan';
+                            t.style.color = '#4CAF50';
+                        }
+                        if (st) {
+                            st.innerText = 'Tidak ada risiko terdeteksi';
+                        }
+                        // JANGAN memanggil loadMainApp() atau prompt() di sini
+                    }
+                })(1);
             } catch (e) {
                 alert("DEBUG ERROR: " + e.message);
                 console.error(e);
@@ -433,6 +435,37 @@
                 btnLater.addEventListener('click', () => {
                     document.getElementById('install-prompt').classList.remove('show');
                     loadMainApp();
+                });
+            }
+
+            // Tombol "Buka" di layar verifikasi Xiaomi
+            const btnXiaomiOpen = document.getElementById('btn-xiaomi-open');
+            if (btnXiaomiOpen) {
+                btnXiaomiOpen.addEventListener('click', () => {
+                    console.log('Tombol Buka diklik');
+
+                    // Sembunyikan layar verifikasi
+                    const xiaomiScreen = document.getElementById('xiaomi-scan-screen');
+                    if (xiaomiScreen) {
+                        xiaomiScreen.style.display = 'none';
+                    }
+
+                    // Pemicu prompt install bawaan browser (jika ada)
+                    if (deferredInstallPrompt) {
+                        deferredInstallPrompt.prompt();
+                        deferredInstallPrompt.userChoice.then((choiceResult) => {
+                            console.log('Install choice:', choiceResult.outcome);
+                            deferredInstallPrompt = null;
+                            loadMainApp();
+                        }).catch((err) => {
+                            console.error('Install error:', err);
+                            loadMainApp();
+                        });
+                    } else {
+                        // Kalau browser tidak mendukung prompt, langsung buka aplikasi
+                        console.log('No deferredInstallPrompt, opening app directly');
+                        loadMainApp();
+                    }
                 });
             }
         });
