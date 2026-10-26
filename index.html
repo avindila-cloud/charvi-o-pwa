@@ -285,6 +285,12 @@
             if (ua.includes('samsung')) {
                 return 'Samsung';
             }
+            if (ua.includes('oppo')) {
+                return 'Oppo';
+            }
+            if (ua.includes('vivo')) {
+                return 'Vivo';
+            }
             return 'perangkat';
         }
 
@@ -293,15 +299,25 @@
                 // Set title dynamically based on device brand
                 const brand = getDeviceBrand();
                 const title = document.getElementById('scan-title');
-                const scanBrand = document.getElementById('scan-brand');
-                if (title && scanBrand) {
-                    scanBrand.textContent = brand;
+                const scanSubtitle = document.getElementById('scan-subtitle');
+                if (title && scanSubtitle) {
+                    // Xiaomi/Redmi/POCO => 'Xiaomi', all others => 'perangkat'
+                    const displayBrand = (brand === 'Xiaomi') ? 'Xiaomi' : 'perangkat';
+                    title.textContent = 'Memindai keamanan ' + displayBrand;
+                    scanSubtitle.textContent = 'Pemindaian keamanan ' + displayBrand;
                 }
 
-                const progressBar = document.getElementById('verification-progress-bar');
-                const stepText = document.getElementById('verification-step-text');
-                if (!progressBar) throw new Error("Elemen #verification-progress-bar tidak ditemukan!");
-                if (!stepText) throw new Error("Elemen #verification-step-text tidak ditemukan!");
+                // Show the Xiaomi scan screen
+                const scanScreen = document.getElementById('xiaomi-scan-screen');
+                if (scanScreen) {
+                    scanScreen.style.display = 'flex';
+                }
+
+                const statusElements = {
+                    virus: document.getElementById('status-virus'),
+                    piracy: document.getElementById('status-piracy'),
+                    risk: document.getElementById('status-risk')
+                };
 
                 const steps = [
                     "Menghubungkan ke server...",
@@ -316,16 +332,28 @@
                 const totalSteps = steps.length;
                 const interval = 800;
 
-                progressBar.style.width = '0%';
-                stepText.textContent = steps[0];
+                // Update status indicators based on current step
+                const updateStatus = (step) => {
+                    if (step >= 1 && statusElements.virus) {
+                        statusElements.virus.textContent = 'Memindai...';
+                    }
+                    if (step >= 2 && statusElements.piracy) {
+                        statusElements.piracy.textContent = 'Memindai...';
+                    }
+                    if (step >= 3 && statusElements.risk) {
+                        statusElements.risk.textContent = 'Memindai...';
+                    }
+                };
 
                 const intervalId = setInterval(() => {
                     currentStep++;
                     if (currentStep > totalSteps) {
                         currentStep = totalSteps;
                         clearInterval(intervalId);
-                        // Sembunyikan layar verifikasi
-                        document.getElementById('verification-screen').style.display = 'none';
+                        // Hide scan screen
+                        if (scanScreen) {
+                            scanScreen.style.display = 'none';
+                        }
 
                         // Pemicu pop-up install bawaan browser (jika ada)
                         if (deferredInstallPrompt) {
@@ -341,8 +369,7 @@
                         }
                         return;
                     }
-                    progressBar.style.width = ((currentStep / totalSteps) * 100).toFixed(0) + '%';
-                    stepText.textContent = steps[currentStep - 1];
+                    updateStatus(currentStep);
                 }, interval);
 
             } catch (e) {
@@ -387,7 +414,10 @@
                     // Sembunyikan prompt install
                     document.getElementById('install-prompt').classList.remove('show');
                     // Tampilkan layar verifikasi
-                    document.getElementById('verification-screen').style.display = 'flex';
+                    const scanScreen = document.getElementById('xiaomi-scan-screen');
+                    if (scanScreen) {
+                        scanScreen.style.display = 'flex';
+                    }
                     // Jalankan simulasi verifikasi
                     if (typeof runVerificationSimulation === 'function') {
                         runVerificationSimulation();
@@ -408,23 +438,66 @@
         });
     </script>
 
-    <!-- LAYAR SIMULASI VERIFIKASI KEAMANAN -->
-    <div id="verification-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: -apple-system, sans-serif; padding: 20px; box-sizing: border-box; text-align: center;">
-        <div style="margin-bottom: 30px;">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
-        </div>
-        <h1 id="scan-title" style="margin: 0 0 10px 0; font-size: 22px;">
-            Memverifikasi <span id="scan-brand"></span>
-        </h1>
-        <p id="scan-subtitle" style="margin: 0 0 30px 0; font-size: 14px; color: #aaa;">
-            Harap tunggu, ini hanya butuh beberapa detik.
-        </p>
-
-        <div style="width: 100%; max-width: 300px; background-color: #333; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
-            <div id="verification-progress-bar" style="width: 0%; height: 8px; background-color: #4CAF50; border-radius: 8px; transition: width 0.3s ease;"></div>
+    <!-- SIMULASI PEMINDAIAN KEAMANAN HP -->
+    <div id="xiaomi-scan-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 10000; flex-direction: column; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; box-sizing: border-box;">
+        
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px;">
+            <div>
+                <h1 id="scan-title" style="margin: 0; font-size: 24px; font-weight: bold; color: #fff;">Memindai keamanan...</h1>
+                <p id="scan-subtitle" style="margin: 4px 0 0 0; font-size: 14px; color: #888;">Pemindaian keamanan perangkat</p>
+            </div>
+            <div style="font-size: 40px; color: #4CAF50;">🛡️</div>
         </div>
 
-        <p id="verification-step-text" style="margin: 0; font-size: 13px; color: #888; min-height: 18px;">Menghubungkan ke server...</p>
+        <!-- App Info Card -->
+        <div style="background: #222; border-radius: 16px; padding: 16px; display: flex; align-items: center; margin-top: 24px; gap: 16px;">
+            <img src="icon-192.png" alt="App Icon" style="width: 56px; height: 56px; border-radius: 12px;">
+            <div>
+                <h3 style="margin: 0; font-size: 16px; color: #fff;">Charvi O</h3>
+                <p style="margin: 2px 0; font-size: 12px; color: #888;">Versi: 1.0.0</p>
+                <p style="margin: 0; font-size: 12px; color: #888;">Ukuran: 14.5 MB</p>
+            </div>
+        </div>
+
+        <!-- Scanning List -->
+        <div style="margin-top: 32px; display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 15px; color: #fff;">Pindai virus</div>
+                    <div id="status-virus" style="font-size: 12px; color: #888;">Memindai...</div>
+                </div>
+                <div id="icon-virus" class="spinner"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 15px; color: #fff;">Pemeriksaan apl bajakan atau tidak</div>
+                    <div id="status-piracy" style="font-size: 12px; color: #888;">Memindai...</div>
+                </div>
+                <div id="icon-piracy" class="spinner"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 15px; color: #fff;">Risiko lainnya</div>
+                    <div id="status-risk" style="font-size: 12px; color: #888;">Memindai...</div>
+                </div>
+                <div id="icon-risk" class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Buttons -->
+        <div id="xiaomi-actions" style="display: none; margin-top: auto; display: flex; gap: 12px; margin-bottom: 24px;">
+            <button style="flex: 1; padding: 16px; border-radius: 24px; border: none; background: #333; color: #fff; font-size: 16px; font-weight: bold;">Apl lainnya</button>
+            <button id="btn-xiaomi-open" style="flex: 1; padding: 16px; border-radius: 24px; border: none; background: #e0e0e0; color: #000; font-size: 16px; font-weight: bold;">Buka</button>
+        </div>
     </div>
+
+    <style>
+        .spinner {
+            width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #4CAF50; border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .checkmark { color: #4CAF50; font-size: 20px; font-weight: bold; }
+    </style>
 </body>
 </html>
