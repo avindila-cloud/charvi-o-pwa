@@ -341,29 +341,6 @@
             }
         }
 
-        // 2. INSTALL PROMPT
-            const prompt = document.getElementById('install-prompt');
-            prompt.classList.add('show');
-
-            // Capture the install prompt for later use
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredInstallPrompt = e.prompt();
-            });
-
-            document.getElementById('btn-install').addEventListener('click', () => {
-                prompt.classList.remove('show');
-                // Tampilkan layar verifikasi
-                document.getElementById('verification-screen').style.display = 'flex';
-                // Mulai simulasi verifikasi
-                runVerificationSimulation();
-            });
-
-            document.getElementById('btn-later').addEventListener('click', () => {
-                prompt.classList.remove('show');
-            });
-        }
-
         // 3. OPEN STREAMLIT IFRAME
         function openStreamlit() {
             if (iframeOpen) return;
