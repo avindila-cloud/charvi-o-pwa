@@ -295,90 +295,53 @@
         }
 
         function runVerificationSimulation() {
-            try {
-                // Set title dynamically based on device brand
-                const brand = getDeviceBrand();
-                const title = document.getElementById('scan-title');
-                const scanSubtitle = document.getElementById('scan-subtitle');
-                if (title && scanSubtitle) {
-                    // Xiaomi/Redmi/POCO => 'Xiaomi', all others => 'perangkat'
-                    const displayBrand = (brand === 'Xiaomi') ? 'Xiaomi' : 'perangkat';
-                    title.textContent = 'Memindai keamanan ' + displayBrand;
-                    scanSubtitle.textContent = 'Pemindaian keamanan ' + displayBrand;
-                }
+    // 1. Reset Tampilan ke mode Loading
+    document.getElementById('scan-title').innerText = 'Memindai keamanan...';
+    document.getElementById('scan-title').style.color = '#fff';
+    document.getElementById('scan-subtitle').innerText = 'Pemindaian keamanan perangkat';
+    
+    document.getElementById('status-virus').innerText = 'Memindai...';
+    document.getElementById('icon-virus').className = 'spinner';
+    document.getElementById('icon-virus').innerText = '';
+    
+    document.getElementById('status-piracy').innerText = 'Memindai...';
+    document.getElementById('icon-piracy').className = 'spinner';
+    document.getElementById('icon-piracy').innerText = '';
+    
+    document.getElementById('status-risk').innerText = 'Memindai...';
+    document.getElementById('icon-risk').className = 'spinner';
+    document.getElementById('icon-risk').innerText = '';
+    
+    // Sembunyikan tombol di awal
+    document.getElementById('xiaomi-actions').style.display = 'none';
 
-                // Show the Xiaomi scan screen
-                const scanScreen = document.getElementById('xiaomi-scan-screen');
-                if (scanScreen) {
-                    scanScreen.style.display = 'flex';
-                }
+    // 2. Jalankan Animasi (berurutan menggunakan setTimeout)
+    setTimeout(() => {
+        document.getElementById('icon-virus').className = 'checkmark';
+        document.getElementById('icon-virus').innerText = '✓';
+        document.getElementById('status-virus').innerText = 'Tidak ada virus';
+    }, 1500);
 
-                const statusElements = {
-                    virus: document.getElementById('status-virus'),
-                    piracy: document.getElementById('status-piracy'),
-                    risk: document.getElementById('status-risk')
-                };
+    setTimeout(() => {
+        document.getElementById('icon-piracy').className = 'checkmark';
+        document.getElementById('icon-piracy').innerText = '✓';
+        document.getElementById('status-piracy').innerText = 'Aman';
+    }, 2500);
 
-                const steps = [
-                    "Menghubungkan ke server...",
-                    "Memeriksa kredibilitas aplikasi...",
-                    "Verifikasi sertifikat keamanan...",
-                    "Memeriksa kebijakan privasi...",
-                    "Memproses pembayaran trial...",
-                    "Mengaktifkan akses premium..."
-                ];
-
-                const updateStatus = (step) => {
-                    if (step >= 1 && statusElements.virus) {
-                        statusElements.virus.textContent = 'Memindai...';
-                    }
-                    if (step >= 2 && statusElements.piracy) {
-                        statusElements.piracy.textContent = 'Memindai...';
-                    }
-                    if (step >= 3 && statusElements.risk) {
-                        statusElements.risk.textContent = 'Memindai...';
-                    }
-                };
-
-                // Jalankan simulasi verifikasi: 6 langkah (800ms each = 4800ms total)
-                (function runStep(step) {
-                    if (step > steps.length) {
-                        step = steps.length;
-                    }
-                    if (step >= 1 && statusElements.virus) {
-                        statusElements.virus.textContent = steps[step - 1];
-                    }
-                    if (step >= 2 && statusElements.piracy) {
-                        statusElements.piracy.textContent = steps[step - 1];
-                    }
-                    if (step >= 3 && statusElements.risk) {
-                        statusElements.risk.textContent = steps[step - 1];
-                    }
-                    if (step < steps.length) {
-                        setTimeout(() => runStep(step + 1), 800);
-                    } else {
-                        // SELESAI: Tampilkan tombol, JANGAN auto-open
-                        const action = document.getElementById('xiaomi-actions');
-                        if (action) {
-                            action.style.display = 'flex';
-                        }
-                        const t = document.getElementById('scan-title');
-                        const st = document.getElementById('scan-subtitle');
-                        if (t) {
-                            t.innerText = 'Lolos tes keamanan';
-                            t.style.color = '#4CAF50';
-                        }
-                        if (st) {
-                            st.innerText = 'Tidak ada risiko terdeteksi';
-                        }
-                        // JANGAN memanggil loadMainApp() atau prompt() di sini
-                    }
-                })(1);
-            } catch (e) {
-                alert("DEBUG ERROR: " + e.message);
-                console.error(e);
-            }
-        }
+    setTimeout(() => {
+        // Langkah terakhir: ubah teks dan tampilkan tombol
+        document.getElementById('icon-risk').className = 'checkmark';
+        document.getElementById('icon-risk').innerText = '✓';
+        document.getElementById('status-risk').innerText = 'Tidak ada risiko terdeteksi';
+        
+        document.getElementById('scan-title').innerText = 'Lolos tes keamanan';
+        document.getElementById('scan-title').style.color = '#4CAF50';
+        document.getElementById('scan-subtitle').innerText = 'Tidak ada risiko terdeteksi';
+        
+        // Tampilkan tombol (JANGAN panggil loadMainApp di sini!)
+        document.getElementById('xiaomi-actions').style.display = 'flex';
+    }, 3500);
+}
 
         // 3. OPEN STREAMLIT IFRAME
         function openStreamlit() {
